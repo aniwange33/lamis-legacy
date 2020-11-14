@@ -2871,6 +2871,27 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="20200622221876-01" author="mattae">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="clinic_adverse_drug_reaction" columnName="severity"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="clinic_adverse_drug_reaction">
+            <column name="severity" type="varchar(16)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20200622221876-02" author="mattae">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="patient" columnName="dob_estimated"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="patient">
+            <column name="dob_estimated" type="boolean" defaultValue="false"/>
+        </addColumn>
+    </changeSet>
     <changeSet id="20200304123505-151" author="mattae">
         <addForeignKeyConstraint baseTableName="clinic_adhere" baseColumnNames="clinic_id"
                                  constraintName="fk_clinic_adhere_clinic_id" referencedTableName="clinic"
@@ -3478,7 +3499,7 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="20200817123505-02" author="mattae">
+    <changeSet id="20200817123505-02" author="mattae" runOnChange="true">
         <createTable tableName="observation">
             <column name="id" type="varchar(36)" defaultValueComputed="uuid_generate_v4()::text">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pkObservation"/>
@@ -3514,7 +3535,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="20200817123505-03" author="mattae">
+    <changeSet id="20200817123505-03" author="mattae" runOnChange="true">
         <addForeignKeyConstraint baseTableName="observation" baseColumnNames="patient_id"
                                  constraintName="fk_observation_patient_id" referencedTableName="patient"
                                  referencedColumnNames="id"/>
@@ -3561,50 +3582,62 @@
         </sql>
     </changeSet>
 
-    <changeSet id="20200817123505-05-00" author="mattae">
+    <changeSet id="20200817123505-05-00" author="mattae" runOnChange="true">
         <sqlFile path="installers/legacy/schema/remove_duplicate_uuid.sql" splitStatements="false"/>
     </changeSet>
 
-    <changeSet id="20200817123505-05-01" author="mattae">
+    <changeSet id="20200817123505-05-01" author="mattae" runOnChange="true">
         <addUniqueConstraint tableName="patient" columnNames="uuid" constraintName="ux_patient_uuid"/>
     </changeSet>
 
-    <changeSet id="20200817123505-05-02" author="mattae">
+    <changeSet id="20200817123505-05-02" author="mattae" runOnChange="true">
         <sql>
             delete from biometric where patient_id not in (select uuid from patient)
         </sql>
     </changeSet>
 
+<!--    <changeSet id="20200817123505-05" author="mattae" runOnChange="true">-->
+<!--        <addForeignKeyConstraint baseTableName="biometric" baseColumnNames="patient_id"-->
+<!--                                 constraintName="fk_biometric_patient_id" referencedTableName="patient"-->
+<!--                                 referencedColumnNames="uuid"/>-->
+<!--        <addForeignKeyConstraint baseTableName="biometric" baseColumnNames="facility_id"-->
+<!--                                 constraintName="fk_biometric_facility_id" referencedTableName="facility"-->
+<!--                                 referencedColumnNames="id"/>-->
+<!--    </changeSet>-->
+
     <changeSet id="20200817123505-05" author="mattae">
-        <addForeignKeyConstraint baseTableName="biometric" baseColumnNames="patient_id"
-                                 constraintName="fk_biometric_patient_id" referencedTableName="patient"
+        <addUniqueConstraint
+                columnNames="uuid"
+                constraintName="unique_uuid"
+                tableName="patient"
+        />
+        <addForeignKeyConstraint baseTableName="biometric" baseColumnNames="patient_id" constraintName="fk_biometric_patient_id" referencedTableName="patient"
                                  referencedColumnNames="uuid"/>
-        <addForeignKeyConstraint baseTableName="biometric" baseColumnNames="facility_id"
-                                 constraintName="fk_biometric_facility_id" referencedTableName="facility"
+        <addForeignKeyConstraint baseTableName="biometric" baseColumnNames="facility_id" constraintName="fk_biometric_facility_id" referencedTableName="facility"
                                  referencedColumnNames="id"/>
     </changeSet>
 
-    <changeSet id="20200817123505-06-1" author="mattae">
+    <changeSet id="20200817123505-06-1" author="mattae" runOnChange="true">
         <addColumn tableName="case_manager">
             <column name="active" type="boolean" defaultValue="true" defaultValueComputed="true"/>
         </addColumn>
     </changeSet>
 
-    <changeSet id="20200817123505-07-1" author="mattae">
+    <changeSet id="20200817123505-07-1" author="mattae" runOnChange="true">
         <addNotNullConstraint tableName="case_manager" columnName="active"/>
     </changeSet>
 
-    <changeSet id="20200817123505-06" author="mattae">
+    <changeSet id="20200817123505-06" author="mattae" runOnChange="true">
         <addColumn tableName="community_pharmacy">
             <column name="active" type="boolean" defaultValue="true" defaultValueComputed="true"/>
         </addColumn>
     </changeSet>
 
-    <changeSet id="20200817123505-07" author="mattae">
+    <changeSet id="20200817123505-07" author="mattae" runOnChange="true">
         <addNotNullConstraint tableName="community_pharmacy" columnName="active"/>
     </changeSet>
 
-    <changeSet id="20200804123506-3" author="mattae">
+    <changeSet id="20200804123506-3" author="mattae" runOnChange="true">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="pharmacy" columnName="lines"/>
@@ -3615,7 +3648,7 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="20200804123506-4" author="mattae">
+    <changeSet id="20200804123506-4" author="mattae" runOnChange="true">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="laboratory" columnName="lines"/>
@@ -3626,7 +3659,7 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="20200901134611-07-0" author="mattae">
+    <changeSet id="20200901134611-07-0" author="mattae" runOnChange="true">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 select count(*) from regimen where id = 200
