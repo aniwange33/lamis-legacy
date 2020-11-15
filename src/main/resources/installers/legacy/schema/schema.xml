@@ -5707,4 +5707,12 @@
             <column name="community_pharmacy_id"/>
         </dropColumn>
     </changeSet>
+
+    <changeSet id="" author="mattae">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="drug_therapy" columnName="adhrence_issues"/>
+        </preConditions>
+        <renameColumn tableName="drug_therapy" oldColumnName="adhrence_issues" newColumnName="adherence_issues"/>
+    </changeSet>
+
 </databaseChangeLog>
